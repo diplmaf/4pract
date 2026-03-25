@@ -1,3 +1,147 @@
+# Поиск адреса на карте (React + DaData API)
+
+---
+
+## src/main.jsx
+объявление точки входа приложения
+
+import React from 'react'
+<br> импорт библиотеки React
+
+import ReactDOM from 'react-dom/client'
+<br> импорт ReactDOM для рендеринга
+
+import App from './App'
+<br> импорт главного компонента App
+
+import 'leaflet/dist/leaflet.css'
+<br> импорт стилей библиотеки Leaflet для карты
+
+import './index.css'
+<br> импорт глобальных стилей
+
+---
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+<br> рендеринг приложения в DOM-элемент с id="root"
+
+<React.StrictMode>
+<br> включение строгого режима React
+
+<App />
+<br> отображение главного компонента
+
+</React.StrictMode>
+<br> закрытие строгого режима
+
+);
+<br> завершение рендеринга
+
+---
+
+## src/App.jsx
+главный компонент приложения
+
+import { useState } from 'react'
+<br> импорт хука useState для управления состоянием
+
+import SearchForm from './components/SearchForm/SearchForm'
+<br> импорт компонента формы поиска
+
+import Map from './components/Map/Map'
+<br> импорт компонента карты
+
+import styles from './App.module.css'
+<br> импорт CSS-модулей для стилизации
+
+---
+
+function App() {
+<br> объявление функционального компонента App
+
+const [coordinates, setCoordinates] = useState(null)
+<br> состояние для хранения координат [широта, долгота]
+
+const [error, setError] = useState('')
+<br> состояние для хранения текста ошибки
+
+const [loading, setLoading] = useState(false)
+<br> состояние для индикации загрузки
+
+---
+
+const DADATA_API_KEY = 'ваш_api_ключ'
+<br> API-ключ DaData (получить на dadata.ru)
+
+const DADATA_SECRET_KEY = 'ваш_секретный_ключ'
+<br> секретный ключ DaData
+
+---
+
+const fetchAddress = async (address) => {
+<br> асинхронная функция для поиска адреса
+
+setLoading(true)
+<br> включение индикатора загрузки
+
+setError('')
+<br> сброс предыдущей ошибки
+
+setCoordinates(null)
+<br> сброс предыдущих координат
+
+---
+
+try {
+<br> начало блока обработки запроса
+
+const response = await fetch('https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address', {
+<br> отправка POST-запроса к API DaData
+
+method: 'POST',
+<br> метод запроса
+
+headers: {
+<br> заголовки запроса
+
+'Content-Type': 'application/json',
+<br> тип содержимого JSON
+
+**'Authorization': Token ${DADATA_API_KEY},**
+<br> авторизация с API-ключ'X-Secret': DADATA_SECRET_KEYEY**
+<br> секретный кл},},**
+<br> закрытие заголовкbody: JSON.stringify({ query: address, count: 1 })})**
+<br> тело запроса с адресом для поис})})**
+<br> закрытие fetch
+
+-const data = await response.json()()**
+<br> преобразование ответа в JSif (data.suggestions && data.suggestions.length > 0) { {**
+<br> проверка наличия результатconst suggestion = data.suggestions[0]0]**
+<br> получение первого результаconst lat = suggestion.data.geo_latat**
+<br> получение широconst lon = suggestion.data.geo_lonon**
+<br> получение долгоsetCoordinates([parseFloat(lat), parseFloat(lon)])])**
+<br> сохранение координ} else { {**
+<br> если адрес не найдsetError('Адрес не найден. Попробуйте уточнить запрос.')')**
+<br> вывод сообщения об ошиб}*}**
+<br> закрытие услов} catch (err) { {**
+<br> обработка ошибsetError('Ошибка сети или сервера')')**
+<br> вывод сообщения об ошиб} finally { {**
+<br> блок, выполняемый в любом случsetLoading(false)e)**
+<br> выключение индикатора загруз}*}**
+<br> закрытие final}*}**
+<br> закрытие функции fetchAddress
+
+-return ( (**
+<br> возврат JSX-размет<div className={styles.app}>}>**
+<br> контейнер приложен<h1>Поиск адреса на карте</h1>1>**
+<br> заголовок страни<SearchForm onSearch={fetchAddress} />/>**
+<br> форма поиска с передачей функции-обработчи{loading && <p>Загрузка...</p>}>}**
+<br> индикатор загруз{error && <p className={styles.error}>{error}</p>}>}**
+<br> вывод ошиб<Map coordinates={coordinates} />/>**
+<br> компонент карты с передачей координ</div>v>**
+<br> закрытие контейне););**
+<br> завершение return
+
 }
 <br> закрытие компонента App
 
